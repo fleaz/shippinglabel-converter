@@ -26,11 +26,17 @@ def do_upload():
 
 @route('/download/<id>')
 def download(id):
-    @hook('after_request')
-    def delFiles():
-        remove(f"./downloads/{id}.pdf")
     filename = f"{id}.pdf"
     return static_file(filename, root='downloads', download=filename)
+
+@hook('after_request')
+def delFiles():
+    if request.path.startswith("/download/"):
+        id = request.path.split("/")[2]
+        try:
+             remove(f"./downloads/{id}.pdf")
+        except FileNotFoundError:
+            return
 
 @route('/static/<filename:path>')
 def send_static(filename):
