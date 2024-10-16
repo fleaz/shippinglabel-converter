@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "shippinglabel-converter"
+version = "0.0.1"
+description = "Convert different shipping label PDFs"
+authors = ["fleaz <mail@felixbreidenstein.de>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bottle = "^0.13.2"
+pypdf = "^5.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
