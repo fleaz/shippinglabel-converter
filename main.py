@@ -1,27 +1,43 @@
-#! /usr/bin/env python3
+import os
+from bottle import route, request, static_file, run, redirect, HTTPResponse, hook
+from random import randint
+from os import remove
 
-from pypdf import PdfWriter, PdfReader, Transformation
-from pypdf.generic import RectangleObject
+from convert import convert_dhl
 
-with open("input.pdf", "rb") as in_f:
-    reader = PdfReader(in_f)
-    writer = PdfWriter()
+@route('/')
+def root():
+    return static_file('index.html', root='templates')
 
-    numPages = len(reader.pages)
-    if numPages != 1:
-        exit(1)
+@route('/dhl', method='POST')
+def do_upload():
+    upload = request.files.get('upload')
+    if upload.content_type != "application/pdf":
+        return HTTPResponse(status=400, body="Bad file")
 
-    page = reader.pages[0].rotate(90)
-    page = reader.pages[0]
+    id = randint(100000,999999)
+    upload.save(f"./uploads/{id}.pdf")
+    convert_dhl(id)
+    print(f"converted {upload.filename} as {id}.pdf")
+    # delete upload file
+    remove(f"./uploads/{id}.pdf")
 
-    left = 20
-    bottom = 450
-    right = 570
-    # calculate last value to get a 3:2 rectangle
-    top = bottom+((right-left)/3)*2
+    return redirect(f"/download/{id}")
 
-    page.mediabox = RectangleObject((left, bottom,right,top))
-    writer.add_page(page)
+@route('/download/<id>')
+def download(id):
+    @hook('after_request')
+    def delFiles():
+        remove(f"./downloads/{id}.pdf")
+    filename = f"{id}.pdf"
+    return static_file(filename, root='downloads', download=filename)
 
-    with open("out.pdf", "wb") as fh:
-        writer.write(fh)
+@route('/static/<filename:path>')
+def send_static(filename):
+    return static_file(filename, root='static/')
+
+if __name__ == '__main__':
+    for p in ['./uploads', './downloads']:
+        if not os.path.exists(p):
+            os.makedirs(p)
+    run(host='0.0.0.0', port=8080)

@@ -1,0 +1,27 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shippinglabel Converter</title>
+    <link rel="stylesheet" href="static/pico.min.css">
+    <link rel="stylesheet" href="static/main.css">
+  </head>
+  <body>
+    <main class="container">
+        <h1>Versandlabel konvertieren</h1>
+        Siehe <a href="https://github.com/fleaz/shippinglabel-converter">github.com/fleaz/shippinglabel-converter</a>
+
+
+        <div class="variant_box">
+            <b>Variante 1</b><br>
+            DHL Paketmarke DIN A4 &#8594; 100mmx150mm
+            <form action="/dhl" method="post" enctype="multipart/form-data">
+              <input name="upload" type="file" size="50" accept="application/pdf"> 
+              <button>Convert!</button>
+            </form>
+        </div>
+    </main>
+  </body>
+</html>
