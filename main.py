@@ -3,14 +3,14 @@ from bottle import route, request, static_file, run, redirect, HTTPResponse, hoo
 from random import randint
 from os import remove
 
-from convert import convert_dhl
+from convert import convert_dhl, convert_hermes
 
 @route('/')
 def root():
     return static_file('index.html', root='templates')
 
 @route('/dhl', method='POST')
-def do_upload():
+def dhl():
     upload = request.files.get('upload')
     if upload.content_type != "application/pdf":
         return HTTPResponse(status=400, body="Bad file")
@@ -18,6 +18,21 @@ def do_upload():
     id = randint(100000,999999)
     upload.save(f"./uploads/{id}.pdf")
     convert_dhl(id)
+    print(f"converted {upload.filename} as {id}.pdf")
+    # delete upload file
+    remove(f"./uploads/{id}.pdf")
+
+    return redirect(f"/download/{id}")
+
+@route('/hermes', method='POST')
+def hermes():
+    upload = request.files.get('upload')
+    if upload.content_type != "application/pdf":
+        return HTTPResponse(status=400, body="Bad file")
+
+    id = randint(100000,999999)
+    upload.save(f"./uploads/{id}.pdf")
+    convert_hermes(id)
     print(f"converted {upload.filename} as {id}.pdf")
     # delete upload file
     remove(f"./uploads/{id}.pdf")
